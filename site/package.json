@@ -19,6 +19,10 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^5.16.0",
+    "grunt": "^1.0.4",
+    "grunt-eslint": "^21.0.0",
+    "grunt-exec": "^3.0.0",
+    "grunt-mocha-test": "^0.13.3",
     "mocha": "^6.1.4",
     "zombie": "^6.1.4"
   }
