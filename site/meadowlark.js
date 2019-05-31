@@ -12,6 +12,9 @@ app.set('view engine', 'handlebars');
 // eslint-disable-next-line no-undef
 app.set('port', process.env.PORT || 3000);
 
+//disable server info
+app.disable('x-powered-by');
+
 // eslint-disable-next-line no-undef
 app.use(express.static(__dirname+'/public'));
 
@@ -30,6 +33,30 @@ app.get('/about', (req, res) => {
         fortune : fortune.get_fortune(), 
         pageTestScript : '/qa/tests-about.js'
     });
+});
+
+// experimenting with req and res headers
+app.get('/headers', (req, res) => {
+    res.type('text/plain');
+    var s = '';
+    for(var name in req.headers){
+        s += name + ' : ' + req.headers[name] + '\n';
+    }
+    res.send(s);
+});
+
+app.get('/greetings', (req, res) => {
+    res.render('about', {
+        message : 'welcome',
+        query : req.query,
+        cookie : req.cookie,
+        signed_cookie : req.signedCookies,
+        session : req.session
+    });
+});
+
+app.get('/no-layout', (req, res) => {
+    res.render('no-layout', {layout : null});
 });
 
 //for integration testing
