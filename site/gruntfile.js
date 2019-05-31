@@ -12,8 +12,8 @@ module.exports = (grunt) => {
     grunt.initConfig({
         mochaTest : {
             all: {
-                src : 'public/qa/tests-*.js', 
-                options : {ui : 'tdd', timeout : 10000}
+                src : 'qa/tests-*.js', 
+                options : {ui : 'tdd', timeout : 100000}
             }
         },
 
