@@ -1,5 +1,7 @@
 var express = require('express');
 var fortune = require('./lib/fortune.js');
+//dummy weather data
+var weather = require('./lib/weather_data.js');
 
 var app = express();
 
@@ -17,6 +19,13 @@ app.disable('x-powered-by');
 
 // eslint-disable-next-line no-undef
 app.use(express.static(__dirname+'/public'));
+
+//middleware for dummy weather partials
+app.use((req, res, next) => {
+    if (!res.locals.partials) res.locals.partials = {};
+    res.locals.partials.weather_data = weather.get_weather_data();
+    next();
+});
 
 //page testing
 app.use((req, res, next) => {
