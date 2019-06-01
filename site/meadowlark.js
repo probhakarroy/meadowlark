@@ -5,8 +5,15 @@ var weather = require('./lib/weather_data.js');
 
 var app = express();
 
-//handlebars
-var handlebars = require('express-handlebars').create({ defaultLayout: 'main' });
+//handlebars 
+//creating sections
+var sections = require('express-handlebars-sections');
+var handlebars = require('express-handlebars').create({
+    defaultLayout: 'main',
+    helpers : {
+        section : sections()
+    }
+ });
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 
@@ -66,6 +73,10 @@ app.get('/greetings', (req, res) => {
 
 app.get('/no-layout', (req, res) => {
     res.render('no-layout', {layout : null});
+});
+
+app.get('/jquery-test', (req, res) => {
+    res.render('jquery-test');
 });
 
 //for integration testing
