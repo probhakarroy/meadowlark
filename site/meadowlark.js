@@ -79,6 +79,19 @@ app.get('/jquery-test', (req, res) => {
     res.render('jquery-test');
 });
 
+app.get('/nursery-rhyme', (req, res) => {
+    res.render('nursery-rhyme');
+});
+
+app.get('/data/nursery-rhyme', function (req, res) {
+    res.json({
+        animal: 'squirrel',
+        bodyPart: 'tail',
+        adjective: 'bushy',
+        noun: 'heck',
+    });
+});
+
 //for integration testing
 app.get('/tours/hood-river', (req, res) => {
     res.render('tours/hood-river');
