@@ -1,4 +1,5 @@
 var express = require('express');
+var formidable = require('formidable');
 var fortune = require('./lib/fortune.js');
 //dummy weather data
 var weather = require('./lib/weather_data.js');
@@ -123,6 +124,32 @@ app.post('/process', (req, res) => {
         res.redirect(303, '/thank-you');
     }
 });
+
+//form handling file upload
+app.get('/contest/vacation-photo', (req, res) => {
+    var now = new Date();
+    res.render('contest/vacation-photo', {
+        year: now.getFullYear(),
+        month : now.getMonth()
+    });
+});
+
+app.post('/contest/vacation-photo/:year/:month', (req, res) => {
+    var form = new formidable.IncomingForm();
+    form.parse(req, (err, fields, files) => {
+        if(err) return res.redirect(303, '/error');
+        // eslint-disable-next-line no-console
+        console.log('received fields : ');
+        // eslint-disable-next-line no-console
+        console.log(fields);
+        // eslint-disable-next-line no-console
+        console.log('received files : ');
+        // eslint-disable-next-line no-console
+        console.log(files);
+        res.redirect(303, '/thank-you');
+    });
+});
+
 
 //Custom 404 Page
 app.use((req, res) => {
