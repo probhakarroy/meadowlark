@@ -1,19 +1,48 @@
 <h2>Sign up for our newsletter to receive news and special!</h2>
-<form class="form-horizontal" role="form" action="/process?form=newsletter" method="POST">
-    <input type="hidden" name="_csrf" value="{{csrf}}">
-    <div class="form-group">
-        <label for="fieldName" class="col-auto">Name</label>
-        <div class="col-auto col-sm-3">
-            <input type="text" class="form-control" id="fieldName" name="name" placeholder="Enter Name">
+<div class="form_container">
+    <form class="form-horizontal newsletter_form" role="form" action="/process?form=newsletter" method="POST">
+        <input type="hidden" name="_csrf" value="{{csrf}}">
+        <div class="form-group">
+            <label for="fieldName" class="col-auto">Name</label>
+            <div class="col-auto col-sm-3">
+                <input type="text" class="form-control" id="fieldName" name="name" placeholder="Enter Name">
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="fieldEmail" class="col-auto">Email</label>
-        <div class="col-auto col-sm-3">
-            <input type="email" class="form-control" id="fieldName" name="email" placeholder="Enter Email">
+        <div class="form-group">
+            <label for="fieldEmail" class="col-auto">Email</label>
+            <div class="col-auto col-sm-3">
+                <input type="email" class="form-control" id="fieldName" name="email" placeholder="Enter Email">
+            </div>
         </div>
-    </div>
-    <div class="col-auto col-sm-3">
-        <button type="submit" class="btn btn-primary">Register</button>
-    </div>
-</form>
+        <div class="col-auto col-sm-3">
+            <button type="submit" class="btn btn-primary">Register</button>
+        </div>
+    </form>
+</div>
+
+{{#section 'jquery'}}
+    <script>
+        $('document').ready(() => {
+            $('.newsletter_form').on('submit', (evt) => {
+                evt.preventDefault();
+                var action = $('.newsletter_form').attr('action');
+                var container = $('.form_container');
+                
+                $.ajax({
+                    url : "/process?form=newsletter",
+                    type : 'POST',
+                    success : (data) => {
+                        if(data.success){
+                            container.html('<h2>Thank you<h2>');
+                        } else {
+                            container.html('There was some problem.');
+                        }
+                    },
+                    error : () => {
+                        container.html('There was some problem.');
+                    }
+                });
+            });
+        });
+    </script>
+{{/section}}
