@@ -27,6 +27,10 @@ app.disable('x-powered-by');
 // eslint-disable-next-line no-undef
 app.use(express.static(__dirname+'/public'));
 
+//using parser in app.js
+app.use(express.json());
+app.use(express.urlencoded({extended : false}));
+
 //middleware for dummy weather partials
 app.use((req, res, next) => {
     if (!res.locals.partials) res.locals.partials = {};
@@ -103,6 +107,20 @@ app.get('/tours/oregon-coast', (req, res) => {
 
 app.get('/tours/request-group-rate', (req, res) => {
     res.render('tours/request-group-rate');
+});
+
+//form handling
+app.get('/newsletter', (req, res) => {
+    res.render('newsletter', {csrf : 'csrf_token'});
+});
+
+app.post('/process', (req, res) => {
+    // eslint-disable-next-line no-console
+    console.log('Form (from querystring): ' + req.query.form);
+    console.log('CSRF token (from hidden form field): ' + req.body._csrf);
+    console.log('Name (from visible form field): ' + req.body.name);
+    console.log('Email (from visible form field): ' + req.body.email);
+    res.redirect(303, '/thank-you');
 });
 
 //Custom 404 Page
