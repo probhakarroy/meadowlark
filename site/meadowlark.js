@@ -11,6 +11,8 @@ var session = require('express-session');
 var fortune = require('./lib/fortune.js');
 var credentials = require('./lib/credentials.js');
 var weather = require('./lib/weather_data.js'); //dummy weather data
+var newsletter = require('./lib/newsletter.js');//dummy newsletter_signup function 
+var common_regex = require('./lib/common_regex.js');//common regexs
 
 
 var app = express();
@@ -140,22 +142,12 @@ app.get('/newsletter', (req, res) => {
     res.render('newsletter', {csrf : 'csrf_token'});
 });
 
-//dummy function for newsletter signup
-function newsletter_signup() {
-
-}
-
-newsletter_signup.prototype.save = (cb) => {
-    cb();
-}
-
-var VALID_EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
-
+//experimentin with express-session
 app.post('/newsletter', (req, res) => {
     var name = req.body.name || '', email = req.body.email || '';
     
     //input validation
-    if(!email.match(VALID_EMAIL_REGEX)){
+    if(!email.match(common_regex.VALID_EMAIL_REGEX)){
         if(req.xhr) return res.json({error : 'Invalid email address.'});
         req.session.flash = {
             type : 'danger',
@@ -165,7 +157,7 @@ app.post('/newsletter', (req, res) => {
         return res.redirect(303, '/newsletter/archive');
     }
 
-    new newsletter_signup({name : name, email : email}).save((err) => {
+    new newsletter.newsletter_signup({name : name, email : email}).save((err) => {
         if(err) {
             if(req.xhr) return res.json({error : 'Database Error.'});
             req.session.flash = {
