@@ -1,7 +1,13 @@
 var express = require('express');
 
-//form handling modules
+//form handling module
 var formidable = require('formidable');
+
+//Compression module
+var compression = require('compression');
+
+//cross-site request forgery protection
+var csurf = require('csurf');
 
 //cookies and session handling modules
 var cookie_parser = require('cookie-parser');
@@ -15,7 +21,9 @@ var newsletter = require('./lib/newsletter.js');//dummy newsletter_signup functi
 var common_regex = require('./lib/common_regex.js');//common regexs
 var cart_validation = require('./lib/cart_validation.js');
 
+
 var app = express();
+
 
 //handlebars 
 //creating sections
@@ -43,6 +51,9 @@ app.use(express.static(__dirname+'/public'));
 app.use(express.json());
 app.use(express.urlencoded({extended : false}));
 
+//compression middleware
+app.use(compression());
+
 //cookie-parser and session middlewares
 app.use(cookie_parser(credentials.cookie_secret));
 app.use(session({
@@ -50,6 +61,9 @@ app.use(session({
     saveUninitialized : false,
     secret : credentials.cookie_secret,
 }));
+
+//csurf middleware linked after express-session middleware
+app.use(csurf());
 
 //experimenting with middleware
 app.use(cart_validation.check_waivers);

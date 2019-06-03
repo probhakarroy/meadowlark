@@ -13,8 +13,10 @@
   "author": "Probhakar Roy",
   "license": "MIT",
   "dependencies": {
+    "compression": "^1.7.4",
     "connect": "^3.7.0",
     "cookie-parser": "^1.4.4",
+    "csurf": "^1.10.0",
     "express": "^4.17.1",
     "express-handlebars": "^3.1.0",
     "express-handlebars-sections": "^1.0.1",
