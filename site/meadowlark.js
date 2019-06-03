@@ -13,7 +13,7 @@ var credentials = require('./lib/credentials.js');
 var weather = require('./lib/weather_data.js'); //dummy weather data
 var newsletter = require('./lib/newsletter.js');//dummy newsletter_signup function 
 var common_regex = require('./lib/common_regex.js');//common regexs
-
+var tour_requires_waiver = require('./lib/tour_requires_waiver.js');
 
 var app = express();
 
@@ -50,6 +50,9 @@ app.use(session({
     saveUninitialized : false,
     secret : credentials.cookie_secret,
 }));
+
+//experimenting with middleware
+app.use(tour_requires_waiver);
 
 //middleware for dummy weather partials
 app.use((req, res, next) => {
