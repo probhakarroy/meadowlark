@@ -13,7 +13,7 @@ var credentials = require('./lib/credentials.js');
 var weather = require('./lib/weather_data.js'); //dummy weather data
 var newsletter = require('./lib/newsletter.js');//dummy newsletter_signup function 
 var common_regex = require('./lib/common_regex.js');//common regexs
-var tour_requires_waiver = require('./lib/tour_requires_waiver.js');
+var cart_validation = require('./lib/cart_validation.js');
 
 var app = express();
 
@@ -52,7 +52,8 @@ app.use(session({
 }));
 
 //experimenting with middleware
-app.use(tour_requires_waiver);
+app.use(cart_validation.check_waivers);
+app.use(cart_validation.check_guest_counts)
 
 //middleware for dummy weather partials
 app.use((req, res, next) => {
