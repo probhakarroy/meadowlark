@@ -6,6 +6,9 @@ var formidable = require('formidable');
 //Compression module
 var compression = require('compression');
 
+//Nodemailer
+var nodemailer = require('nodemailer');
+
 //cross-site request forgery protection
 var csurf = require('csurf');
 
@@ -37,6 +40,25 @@ var handlebars = require('express-handlebars').create({
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 
+//Nodemailer transport instance
+var mail_transport = nodemailer.createTransport({
+    service : 'Gmail',
+    auth : {
+        user : credentials.gmail.user,
+        pass : credentials.gmail.password
+    }
+});
+
+//experimenting with mail
+mail_transport.sendMail({
+    from : '"meadowlark Travel" <info@meadowlarktravel.com>',
+    to : 'probhakarroy3110@gmail.com',
+    subject : 'Your Meadowlar Travel Tour',
+    text : 'Thank you for booking your trip with Meadowlark Travel. We look forward to your visit!',
+    }, (err) => {
+    // eslint-disable-next-line no-console
+    if(err) console.error('Unable to send email : '+err);
+    });
 
 // eslint-disable-next-line no-undef
 app.set('port', process.env.PORT || 3000);
