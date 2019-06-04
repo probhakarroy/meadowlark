@@ -12,7 +12,7 @@ module.exports = (credentials) => {
     });
 
     var from = '"Meadowlark Travel" <info@meadowlarktravel.com>';
-    var errorRecipient = 'youremail@gmail.com';
+    var error_recipient = '"Maintainer" probhakarroy3110@gmail.com';
 
     return {
         send: function (to, subj, body) {
@@ -27,16 +27,14 @@ module.exports = (credentials) => {
                 if (err) console.error('Unable to send email: ' + err);
             });
         },
-        emailError: function (message, filename, exception) {
+        email_error: function (message, filename, exception) {
             var body = '<h1>Meadowlark Travel Site Error</h1>' +
                 'message:<br><pre>' + message + '</pre><br>';
-            if (exception) body += 'exception:<br><pre>' + exception
-                + '</pre><br>';
-            if (filename) body += 'filename:<br><pre>' + filename
-                + '</pre><br>';
+            if(exception) body += 'exception:<br><pre>' + exception + '</pre><br>';
+            if(filename) body += 'filename:<br><pre>' + filename + '</pre><br>';
             mail_transport.sendMail({
                 from: from,
-                to: errorRecipient,
+                to: error_recipient,
                 subject: 'Meadowlark Travel Site Error',
                 html: body,
                 generateTextFromHtml: true
