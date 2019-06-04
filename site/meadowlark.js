@@ -6,8 +6,8 @@ var formidable = require('formidable');
 //Compression module
 var compression = require('compression');
 
-//Nodemailer
-var nodemailer = require('nodemailer');
+//email functionality encapsulation
+var email_service = require('./lib/email.js');
 
 //cross-site request forgery protection
 var csurf = require('csurf');
@@ -27,6 +27,8 @@ var cart_validation = require('./lib/cart_validation.js');
 
 var app = express();
 
+//email service credentials
+email_service = email_service(credentials);
 
 //handlebars 
 //creating sections
@@ -39,26 +41,6 @@ var handlebars = require('express-handlebars').create({
  });
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
-
-//Nodemailer transport instance
-var mail_transport = nodemailer.createTransport({
-    service : 'Gmail',
-    auth : {
-        user : credentials.gmail.user,
-        pass : credentials.gmail.password
-    }
-});
-
-//experimenting with mail
-mail_transport.sendMail({
-    from : '"meadowlark Travel" <info@meadowlarktravel.com>',
-    to : 'probhakarroy3110@gmail.com',
-    subject : 'Your Meadowlar Travel Tour',
-    text : 'Thank you for booking your trip with Meadowlark Travel. We look forward to your visit!',
-    }, (err) => {
-    // eslint-disable-next-line no-console
-    if(err) console.error('Unable to send email : '+err);
-    });
 
 // eslint-disable-next-line no-undef
 app.set('port', process.env.PORT || 3000);
@@ -242,6 +224,36 @@ app.post('/contest/vacation-photo/:year/:month', (req, res) => {
     });
 });
 
+//handling of cart-checkout using email.
+app.post('/cart/checkout', (req, res) => {
+    var cart = req.session.cart;
+    if (!cart) res.next(new Error('Cart does not exist.'));
+    
+    var name = req.body.name || '', email = req.body.email || '';
+    
+    //input validation
+    if (!email.match(common_regex.VALID_EMAIL_REGEX))
+        return res.next(new Error('Invalid email address.'));
+    
+        //assign a random cart ID; normally we use a database ID here
+    cart.number = Math.random().toString().replace(/^0\.0*/, '');
+    cart.billing = {
+        name: name,
+        email: email
+    };
+
+    res.render('email/cart-thank-you', {
+        layout: null,
+        cart: cart
+    }, (err, html) => {
+        // eslint-disable-next-line no-console
+        if(err) console.error('error in email template');
+        email_service.send(cart.billing.email, 'Thank You for Booking wour Trip with Meadowlark', html);
+    });
+    
+    res.render('cart-thank-you', { cart: cart });
+});
+
 
 //Custom 404 Page
 app.use((req, res) => {
@@ -261,6 +273,6 @@ app.use((err, req, res, next) => {
 app.listen(app.get('port'), () => {
     // eslint-disable-next-line no-console
     console.log('Express started on http://localhost:' +
-    app.get('port')+ '; press Ctrl-C to terminate.');
+    app.get('port') + '; press Ctrl-C to terminate.');
 });
 
