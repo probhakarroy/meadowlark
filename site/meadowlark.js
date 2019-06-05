@@ -16,6 +16,9 @@ var csurf = require('csurf');
 var cookie_parser = require('cookie-parser');
 var session = require('express-session');
 
+//logger
+var morgan = require('morgan');
+
 //local libraries
 var fortune = require('./lib/fortune.js');
 var credentials = require('./lib/credentials.js');
@@ -26,6 +29,18 @@ var cart_validation = require('./lib/cart_validation.js');
 
 
 var app = express();
+
+
+//logger
+switch(app.get('env')){
+    case 'development' : 
+        app.use(morgan('dev'));
+        break;
+    
+    case 'production' :
+        app.use(morgan('combined'));
+        break;
+}
 
 //email service credentials
 email_service = email_service(credentials);
@@ -272,7 +287,7 @@ app.use((err, req, res, next) => {
 
 app.listen(app.get('port'), () => {
     // eslint-disable-next-line no-console
-    console.log('Express started on http://localhost:' +
+    console.log('Express started in ' + app.get('env') +' mode on http://localhost:' +
     app.get('port') + '; press Ctrl-C to terminate.');
 });
 
