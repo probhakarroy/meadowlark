@@ -269,7 +269,6 @@ app.post('/cart/checkout', (req, res) => {
     res.render('cart-thank-you', { cart: cart });
 });
 
-
 //Custom 404 Page
 app.use((req, res) => {
     res.status(404);
@@ -291,3 +290,4 @@ app.listen(app.get('port'), () => {
     app.get('port') + '; press Ctrl-C to terminate.');
 });
 
+module.exports = app;
