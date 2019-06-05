@@ -19,6 +19,9 @@ var session = require('express-session');
 //logger
 var morgan = require('morgan');
 
+//express domain middleware
+var domain = require('express-domain-middleware');
+
 //local libraries
 var fortune = require('./lib/fortune.js');
 var credentials = require('./lib/credentials.js');
@@ -83,6 +86,10 @@ app.use(session({
 
 //csurf middleware linked after express-session middleware
 app.use(csurf());
+
+
+//Unchaught Exception handling using Domains
+app.use(domain);
 
 //experimenting with middleware
 app.use(cart_validation.check_waivers);
@@ -267,6 +274,14 @@ app.post('/cart/checkout', (req, res) => {
     });
     
     res.render('cart-thank-you', { cart: cart });
+});
+
+//Handling Uncaught Exceptions
+// eslint-disable-next-line no-unused-vars
+app.get('/epic-fail', (req, res) => {
+    setTimeout(() => {
+        throw new Error('Nope!');
+    }, 0);
 });
 
 //Custom 404 Page

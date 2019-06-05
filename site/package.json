@@ -18,6 +18,7 @@
     "cookie-parser": "^1.4.4",
     "csurf": "^1.10.0",
     "express": "^4.17.1",
+    "express-domain-middleware": "^0.1.0",
     "express-handlebars": "^3.1.0",
     "express-handlebars-sections": "^1.0.1",
     "express-session": "^1.16.1",
