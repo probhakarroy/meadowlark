@@ -3,6 +3,9 @@ var express = require('express');
 //form handling module
 var formidable = require('formidable');
 
+//fs module
+var fs = require('fs');
+
 //Compression module
 var compression = require('compression');
 
@@ -10,7 +13,7 @@ var compression = require('compression');
 var email_service = require('./lib/email.js');
 
 //cross-site request forgery protection
-var csurf = require('csurf');
+//var csurf = require('csurf');
 
 //cookies and session handling modules
 var cookie_parser = require('cookie-parser');
@@ -85,7 +88,7 @@ app.use(session({
 }));
 
 //csurf middleware linked after express-session middleware
-app.use(csurf());
+//app.use(csurf());
 
 
 //Unchaught Exception handling using Domains
@@ -230,19 +233,41 @@ app.get('/contest/vacation-photo', (req, res) => {
     });
 });
 
+// eslint-disable-next-line no-undef
+var data_dir = __dirname+'/data';
+var vacation_photo_dir = data_dir+'/vacation-photo';
+fs.existsSync(data_dir) || fs.mkdirSync(data_dir);
+fs.existsSync(vacation_photo_dir) || fs.mkdirSync(vacation_photo_dir);
+
+var save_contest_entry = (contest_name, email, year, month, photo_path) => {
+    //TODO
+}
+
 app.post('/contest/vacation-photo/:year/:month', (req, res) => {
     var form = new formidable.IncomingForm();
     form.parse(req, (err, fields, files) => {
         if(err) return res.redirect(303, '/error');
-        // eslint-disable-next-line no-console
-        console.log('received fields : ');
-        // eslint-disable-next-line no-console
-        console.log(fields);
-        // eslint-disable-next-line no-console
-        console.log('received files : ');
-        // eslint-disable-next-line no-console
-        console.log(files);
-        res.redirect(303, '/thank-you');
+        if(err) {
+            res.session.flash = {
+                type : 'danger',
+                intro : 'Oops!',
+                message : 'There was an error processing your submission. Please try again.'
+            };
+            return res.redirect(303, '/contest/vacation-photo');
+        }
+        var photo = files.photo;
+        var dir = vacation_photo_dir+'/'+Date.now();
+        var path = dir+'/'+photo.name;
+        fs.mkdirSync(dir);
+        fs.renameSync(photo.path, dir+'/'+photo.name);
+        save_contest_entry('vacation-photo', fields.email, req.params.year, req.params.month, path);
+        req.session.flash = {
+            type : 'success',
+            intro : 'Good Luck!',
+            message : 'You have been entered into the contest.'
+        }
+
+        return res.redirect(303, '/contest/vaction-photo/entries');
     });
 });
 
