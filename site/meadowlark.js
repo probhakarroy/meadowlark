@@ -32,6 +32,7 @@ var weather = require('./lib/weather_data.js'); //dummy weather data
 var newsletter = require('./lib/newsletter.js');//dummy newsletter_signup function 
 var common_regex = require('./lib/common_regex.js');//common regexs
 var cart_validation = require('./lib/cart_validation.js');
+var gcs = require('./lib/gcloud.js');
 
 
 var app = express();
@@ -48,8 +49,9 @@ switch(app.get('env')){
         break;
 }
 
-//email service credentials
+//email & gcs service credentials
 email_service = email_service(credentials);
+gcs = gcs(credentials);
 
 //handlebars 
 //creating sections
@@ -116,7 +118,7 @@ app.use((req, res, next) => {
     res.locals.flash = req.session.flash;
     delete req.session.flash;
     next();
-})
+});
 
 //app routes
 app.get('/', (req, res) => {
@@ -261,10 +263,14 @@ app.post('/contest/vacation-photo/:year/:month', (req, res) => {
         fs.mkdirSync(dir);
         fs.renameSync(photo.path, dir+'/'+photo.name);
         save_contest_entry('vacation-photo', fields.email, req.params.year, req.params.month, path);
+        
+        // eslint-disable-next-line no-unused-vars
+        gcs.file_upload(dir + '/' + photo.name, 'simplica');
+
         req.session.flash = {
             type : 'success',
             intro : 'Good Luck!',
-            message : 'You have been entered into the contest.'
+            message: 'You have been entered into the contest.'
         }
 
         return res.redirect(303, '/contest/vaction-photo/entries');
