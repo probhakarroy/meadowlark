@@ -25,6 +25,9 @@ var morgan = require('morgan');
 //express domain middleware
 var domain = require('express-domain-middleware');
 
+//ODM
+var mongoose = require('mongoose');
+
 //local libraries
 var fortune = require('./lib/fortune.js');
 var credentials = require('./lib/credentials.js');
@@ -33,6 +36,9 @@ var newsletter = require('./lib/newsletter.js');//dummy newsletter_signup functi
 var common_regex = require('./lib/common_regex.js');//common regexs
 var cart_validation = require('./lib/cart_validation.js');
 var gcs = require('./lib/gcloud.js');
+
+//Db models
+var Vacation = require('./models/vacation.js');
 
 
 var app = express();
@@ -48,6 +54,90 @@ switch(app.get('env')){
         app.use(morgan('combined'));
         break;
 }
+
+//ODM connection
+var opts = {
+    keepAlive : 1,
+    useNewUrlParser : true,
+};
+
+switch(app.get('env')){
+    case 'development' :
+        mongoose.connect(credentials.mongo.development.connection_string, opts)
+            .then(() => {
+                // eslint-disable-next-line no-console
+                console.log('Successfully Connected to the '+app.get('env')+' Db');
+            })
+            .catch((err) => {
+                // eslint-disable-next-line no-console
+                if (err) return console.error('Error connecting to mongodb' + err);
+            });
+        break;
+    
+    case 'production':
+        mongoose.connect(credentials.mongo.production.connectionString, opts)
+            .then(() => {
+                // eslint-disable-next-line no-console
+                console.log('Successfully Connected to the ' + app.get('env') + ' Db');
+            })
+            .catch((err) => {
+                // eslint-disable-next-line no-console
+                if (err) return console.error('Error connecting to mongodb' + err);
+            });
+        break;
+    
+    default :
+        throw new Error('Unknown execution environment : ' + app.get('env'));
+}
+
+Vacation.find((err, vacation) => {
+    if(vacation.length) return;
+
+    new Vacation({
+        name : 'Hood River Day Trip',
+        slug : 'hood-river-day-trip',
+        category : 'Day Trip',
+        sku : 'HR199',
+        description : 'Spend a day sailing on the Columbia and ' +
+            'enjoying craft beers in Hood River!',
+        price_in_cents : 9995,
+        tags : ['day trip', 'hood river', 'sailing', 'windsurfing', 'breweries'],
+        in_season : true,
+        maximum_guests : 16,
+        available : true,
+        packages_sold : 0,
+    }).save();
+
+    new Vacation({
+        name : 'Oregon Coast Getaway',
+        slug : 'oregon-coast-getaway',
+        category : 'Weekend Getaway',
+        sku : 'OC39',
+        description : 'Enjoy the ocean air and quaint coastal towns!',
+        price_in_cents : 269995,
+        tags : ['weekend getaway', 'oregon coast', 'beachcombing'],
+        in_season : false,
+        maximum_guests : 8,
+        available : true,
+        packages_sold : 0,
+    }).save();
+
+    new Vacation({
+        name : 'Rock Climbing in Bend',
+        slug : 'rock-climbing-in-bend',
+        category : 'Adventure',
+        sku : 'B99',
+        description : 'Experience the thrill of climbing in the high desert.',
+        price_in_cents : 289995,
+        tags : ['weekend getaway', 'bend', 'high desert', 'rock climbing'],
+        in_season : true,
+        requires_waiver : true,
+        maximum_guests : 4,
+        available : false,
+        packages_sold : 0,
+        notes : 'The tour guide is currently recovering from a skiing accident.',
+    }).save();
+});
 
 //email & gcs service credentials
 email_service = email_service(credentials);
@@ -92,13 +182,12 @@ app.use(session({
 //csurf middleware linked after express-session middleware
 //app.use(csurf());
 
-
 //Unchaught Exception handling using Domains
 app.use(domain);
 
 //experimenting with middleware
 app.use(cart_validation.check_waivers);
-app.use(cart_validation.check_guest_counts)
+app.use(cart_validation.check_guest_counts);
 
 //middleware for dummy weather partials
 app.use((req, res, next) => {
@@ -313,6 +402,24 @@ app.get('/epic-fail', (req, res) => {
     setTimeout(() => {
         throw new Error('Nope!');
     }, 0);
+});
+
+//adding Db persistence
+app.get('/vacations', (req, res) => {
+    Vacation.find({ available : true}, (err, vacations) => {
+        var context = {
+            vacations : vacations.map((vacation) => {
+                return {
+                    sku : vacation.sku,
+                    name: vacation.name,
+                    description: vacation.description,
+                    price: vacation.get_display_price(),
+                    in_season: vacation.in_season,
+                }
+            })
+        };
+        res.render('vacations', context);
+    });
 });
 
 //Custom 404 Page
