@@ -39,6 +39,7 @@ var gcs = require('./lib/gcloud.js');
 
 //Db models
 var Vacation = require('./models/vacation.js');
+var vacation_in_season_listerner = require('./models/vacation_in_season_listener.js');
 
 
 var app = express();
@@ -100,7 +101,7 @@ Vacation.find((err, vacation) => {
         sku : 'HR199',
         description : 'Spend a day sailing on the Columbia and ' +
             'enjoying craft beers in Hood River!',
-        price_in_cents : 9995,
+        price_in_cents : 29995,
         tags : ['day trip', 'hood river', 'sailing', 'windsurfing', 'breweries'],
         in_season : true,
         maximum_guests : 16,
@@ -421,6 +422,37 @@ app.get('/vacations', (req, res) => {
         res.render('vacations', context);
     });
 });
+
+//push data in Db
+app.get('/notify-me-when-in-season', (req, res) => {
+    res.render('notify-me-when-in-season', { sku: req.query.sku });
+});
+
+app.post('/notify-me-when-in-season', (req, res) => {
+    vacation_in_season_listerner.update(
+        { email : req.body.email },
+        { $push: { skus: req.body.sku } },
+        { upsert: true },
+        (err) => {
+            if (err) {
+                // eslint-disable-next-line no-console
+                console.error(err.stack);
+                req.session.flash = {
+                    type: 'danger',
+                    intro: 'Ooops!',
+                    message: 'There was an error processing your request.',
+                };
+                return res.redirect(303, '/vacations');
+            }
+            req.session.flash = {
+                type: 'success',
+                intro: 'Thank you!',
+                message: 'You will be notified when this vacation is in season.',
+            };
+            return res.redirect(303, '/vacations');
+        }
+    );
+})
 
 //Custom 404 Page
 app.use((req, res) => {
