@@ -43,6 +43,9 @@ var currency_converter = require('./lib/currency_converter.js');
 var Vacation = require('./models/vacation.js');
 var vacation_in_season_listerner = require('./models/vacation_in_season_listener.js');
 
+//vhost module for creating subdomain
+var vhost = require('vhost');
+
 
 var app = express();
 
@@ -216,6 +219,19 @@ app.use((req, res, next) => {
     next();
 });
 
+//admin subdomain
+var admin = express.Router();
+app.use(vhost('admin.*', admin));
+
+//admin routes
+admin.get('/', (req, res) => {
+    res.render('admin/home');
+});
+
+admin.get('/users', (req, res) => {
+    res.render('admin/users');
+});
+
 //app routes
 app.get('/', (req, res) => {
     res.render('home');
@@ -337,6 +353,7 @@ var vacation_photo_dir = data_dir+'/vacation-photo';
 fs.existsSync(data_dir) || fs.mkdirSync(data_dir);
 fs.existsSync(vacation_photo_dir) || fs.mkdirSync(vacation_photo_dir);
 
+// eslint-disable-next-line no-unused-vars
 var save_contest_entry = (contest_name, email, year, month, photo_path) => {
     //TODO
 }
@@ -448,7 +465,7 @@ app.get('/vacations', (req, res) => {
 
 app.get('/set-currency/:currency', (req, res) => {
     req.session.currency = req.params.currency;
-    return res.redirect(303, '/vactions');
+    return res.redirect(303, '/vacations');
 });
 
 //push data in Db
