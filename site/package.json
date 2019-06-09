@@ -16,6 +16,7 @@
     "@google-cloud/storage": "^2.5.0",
     "compression": "^1.7.4",
     "connect": "^3.7.0",
+    "connect-mongo": "^2.0.3",
     "cookie-parser": "^1.4.4",
     "csurf": "^1.10.0",
     "express": "^4.17.1",

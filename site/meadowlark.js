@@ -18,6 +18,7 @@ var email_service = require('./lib/email.js');
 //cookies and session handling modules
 var cookie_parser = require('cookie-parser');
 var session = require('express-session');
+var mongo_store = require('connect-mongo');
 
 //logger
 var morgan = require('morgan');
@@ -36,6 +37,7 @@ var newsletter = require('./lib/newsletter.js');//dummy newsletter_signup functi
 var common_regex = require('./lib/common_regex.js');//common regexs
 var cart_validation = require('./lib/cart_validation.js');
 var gcs = require('./lib/gcloud.js');
+var currency_converter = require('./lib/currency_converter.js');
 
 //Db models
 var Vacation = require('./models/vacation.js');
@@ -172,12 +174,16 @@ app.use(express.urlencoded({extended : false}));
 //compression middleware
 app.use(compression());
 
+//connect-mongo
+mongo_store = mongo_store(session);
+
 //cookie-parser and session middlewares
 app.use(cookie_parser(credentials.cookie_secret));
 app.use(session({
     resave : false,
     saveUninitialized : false,
     secret : credentials.cookie_secret,
+    store : new mongo_store({mongooseConnection : mongoose.connection})
 }));
 
 //csurf middleware linked after express-session middleware
@@ -408,19 +414,41 @@ app.get('/epic-fail', (req, res) => {
 //adding Db persistence
 app.get('/vacations', (req, res) => {
     Vacation.find({ available : true}, (err, vacations) => {
+        var currency = req.session.currency || 'USD';
         var context = {
+            currency : currency,
             vacations : vacations.map((vacation) => {
                 return {
                     sku : vacation.sku,
                     name: vacation.name,
                     description: vacation.description,
-                    price: vacation.get_display_price(),
+                    price: currency_converter.convert_from_USD(vacation.price_in_cents/100, currency),
                     in_season: vacation.in_season,
+                    qty : vacation.qty
                 }
             })
         };
+
+        switch(currency){
+            case 'USD' :
+                context.currencyUSD = 'selected';
+                break;
+            
+            case 'GBP' :
+                context.currencyGBP = 'selected';
+                break;
+
+            case 'BTC' :
+                context.currencyBTC = 'selected';
+                break;
+        }
         res.render('vacations', context);
     });
+});
+
+app.get('/set-currency/:currency', (req, res) => {
+    req.session.currency = req.params.currency;
+    return res.redirect(303, '/vactions');
 });
 
 //push data in Db
