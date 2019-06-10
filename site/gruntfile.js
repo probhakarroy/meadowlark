@@ -21,7 +21,9 @@ module.exports = (grunt) => {
             app : [
                 'meadowlark.js',
                 'public/js/**/*.js',
-                'lib/**/*.js'
+                'lib/**/*.js',
+                'handlers/**/*.js',
+                'models/**/*.js'
             ],
             qa : [
                 'grunt.js', 
