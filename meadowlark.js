@@ -139,8 +139,12 @@ app.use((req, res, next) => {
 var admin = express.Router();
 app.use(vhost('admin.*', admin));
 
+//api subdomain
+var api = express.Router();
+app.use(vhost('api.*', api));
+
 //routes binding
-routes(app, admin);
+routes(app, admin, api);
 
 //Auto view control
 var auto_views = {};

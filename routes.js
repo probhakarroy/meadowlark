@@ -3,8 +3,9 @@ var app_main = require('./handlers/app_main.js');
 var admin_main = require('./handlers/admin_main.js');
 var vacations = require('./handlers/vacations.js');
 var experiment = require('./handlers/experiment.js');
+var api_handler = require('./handlers/api.js');
 
-module.exports = (app, admin) => {
+module.exports = (app, admin, api) => {
     //app routes
     app.get('/', app_main.home);
     app.get('/about', app_main.about);
@@ -38,4 +39,10 @@ module.exports = (app, admin) => {
     //admin routes
     admin.get('/', admin_main.home);
     admin.get('/users', admin_main.users);
+
+
+    //api routes
+    api.get('/attraction', api_handler.attraction_get);
+    api.post('/attraction', api_handler.attraction_post);
+    api.get('/attraction/:id', api_handler.attraction_id_get);
 }
