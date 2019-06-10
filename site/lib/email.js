@@ -27,6 +27,7 @@ module.exports = (credentials) => {
                 if (err) console.error('Unable to send email: ' + err);
             });
         },
+        
         email_error: function (message, filename, exception) {
             var body = '<h1>Meadowlark Travel Site Error</h1>' +
                 'message:<br><pre>' + message + '</pre><br>';
