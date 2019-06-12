@@ -8,6 +8,10 @@ var vhost = require('vhost'); //vhost module for creating subdomain
 var fs = require('fs'); //fs module
 var routes = require('./routes.js'); //routes
 var middlewares = require('./handlers/middlewares.js'); //middleware handlers
+var cors = require('cors');
+
+//MVC controllers path
+//var customer = require('./controllers/customer.js');
 
 //cookies and session handling modules
 var cookie_parser = require('cookie-parser');
@@ -143,8 +147,14 @@ app.use(vhost('admin.*', admin));
 var api = express.Router();
 app.use(vhost('api.*', api));
 
+//api cors binding
+api.use(cors());
+
 //routes binding
 routes(app, admin, api);
+
+//controllers
+//customer(app);
 
 //Auto view control
 var auto_views = {};
