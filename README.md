@@ -10,6 +10,9 @@
   <a href="https://github.com/probhakarroy/meadowlark/blob/master/LICENSE">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" target="_blank" />
   </a>
+  <a href="https://travis-ci.com/probhakarroy/meadowlark">
+    <img src="https://travis-ci.com/probhakarroy/meadowlark.svg?branch=master" alt="Build Status" >
+  </a>
 </p>
 
 > site for meadowlark travel agency
