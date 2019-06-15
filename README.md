@@ -22,6 +22,31 @@
 npm install
 ```
 
+## Add Credentials
+
+Create lib/credentials.js with :-
+```sh
+module.exports = {
+    cookie_secret: 'Cookie Secret String',
+    gmail : {
+        user : 'Email Username',
+        password : 'Password',
+    },
+    gcs : {
+        project_id : 'Google Cloud Storage Project Id',
+        key: 'path to your private key for your Google Cloud Storage',
+    },
+    mongo : {
+        development : {
+            connection_string: 'Connection String for your development MongoDb Atlas Database'
+        },
+        production : {
+            connection_string: 'Connection String for your production MongoDb Atlas Database'
+        },
+    }
+};
+```
+
 ## Usage
 
 ```sh
