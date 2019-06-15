@@ -10,7 +10,7 @@ cache:
     - node_modules
 before_install:
   - sh create_credentials_js.sh
-  - cat lib/credentials.js
+  - sudo apt-get install -y linkchecker
 install:
   - npm install
 script:
