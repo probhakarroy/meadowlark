@@ -10,6 +10,7 @@ cache:
     - node_modules
 before_install:
   - sh create_credentials_js.sh
+  - cat lib/credentials.js
 install:
   - npm install
 script:
