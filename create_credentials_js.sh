@@ -14,7 +14,7 @@ module.exports = {
     },
     mongo : {
         development : {
-            connection_string: '${mondo_dev}'
+            connection_string: '${mongo_dev}'
         },
         production : {
             connection_string: '${mongo_production}'
