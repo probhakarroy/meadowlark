@@ -8,7 +8,7 @@
     "url": "https://github.com/probhakarroy/meadowlark.git"
   },
   "scripts": {
-    "start": "node meadowlark_cluster.js",    
+    "start": "node meadowlark_cluster.js",
     "test": "grunt"
   },
   "author": "Probhakar Roy",
